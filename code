@@ -32,7 +32,15 @@ chat_id = None
 # Инициализация бота и диспетчера
 bot = Bot(token=token)
 dp = Dispatcher()
-
+date0 = None
+day0 = None
+month0 = None
+year0 = None
+expense_table = pd.DataFrame({
+        "Затраты": [],
+        "Дата": [],
+        "Деньги": []
+    })
 
 # ==================== ОБРАБОТЧИКИ КОМАНД ====================
 
@@ -53,6 +61,8 @@ async def staring(message: types.Message):
     chat_id = message.chat.id
     user = message.from_user
     await message.answer(f"👋Привет, {user.first_name}, здесь ты сможешь узнать свои еженедельные затраты.")
+
+
     photo_path = r"C:\Users\PC\Pictures\Screenshots\Снимок экрана 2026-04-03 210252.png"
 
     # Открываем файл и отправляем
@@ -246,6 +256,33 @@ async def expenses_func(message: types.Message):
         photo=types.BufferedInputFile(buffer.getvalue(), filename="plot.png"),
         caption="📊 График затрат по дням"
     )
+
+@dp.message()
+async def buget(message: types.Message):
+    date = message.date  # это datetime объект
+    day = date.day
+    month = date.month
+    year = date.year
+    text = message.text
+    first_word = text.split()[0]
+    two_word = text.split()[1]
+    a = 0
+    while a == 0:
+        global date0
+        global day0
+        global month0
+        global year0
+        global expense_table
+        date0 = date
+        day0 = day
+        month0 = month
+        year0 = year
+        a += 1
+
+    if year == year0 and month == month0 and day == day0:
+        expense_table.loc[len(expense_table)] = [first_word, two_word, date0]
+        print(expense_table)
+        await message.answer("Занёс в список")
 
 
 # ==================== ЗАПУСК БОТА ====================
